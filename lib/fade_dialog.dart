@@ -1,35 +1,36 @@
 import 'package:flutter/material.dart';
 
-void fadeDialog(BuildContext context, String content, String no, String yes, void Function()? onNo, void Function()? onYes)
-{
-  fadePopup(context, AlertDialog(
-    //title: Text(title),
-    content: Text(content,
-      style: Theme.of(context).textTheme.bodyMedium,
-    ),
-    actions: <Widget>[
-      TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            if(onNo != null) {
-              onNo();
-            }
-          },
-          child: Text(no),
+void fadeDialog(BuildContext context, String content, String no, String yes, void Function()? onNo, void Function()? onYes) {
+  fadePopup(
+      context,
+      AlertDialog(
+        //title: Text(title),
+        content: Text(
+          content,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (onNo != null) {
+                onNo();
+              }
+            },
+            child: Text(no),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              if (onYes != null) {
+                onYes();
+              }
+            },
+            child: Text(yes),
+          ),
+        ],
       ),
-      TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            if(onYes != null) {
-              onYes();
-            }
-          },
-          child: Text(yes),
-      ),
-    ],
-  ),
-    dismissable: true
-  );
+      dismissable: true);
 }
 
 void fadePopup(BuildContext context, Widget contents, {bool dismissable = false}) {
@@ -53,14 +54,11 @@ void fadePopup(BuildContext context, Widget contents, {bool dismissable = false}
 
       final opacity = CurvedAnimation(parent: a1, curve: curve);
 
-      return WillPopScope(
-        onWillPop: () async => false,
+      return PopScope(
+        canPop: false,
         child: FadeTransition(
           opacity: opacity,
-          child: SlideTransition(
-            position: tween.animate(curvedAnimation),
-            child: contents
-          ),
+          child: SlideTransition(position: tween.animate(curvedAnimation), child: contents),
         ),
       );
     },

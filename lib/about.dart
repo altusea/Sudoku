@@ -28,10 +28,7 @@ class _AboutState extends State<About> {
           child: Center(
             child: Column(
               children: [
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: makeAppBar(context, "", null)
-                ),
+                Align(alignment: Alignment.topLeft, child: makeAppBar(context, "", null)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 50.0),
                   child: Column(children: [
@@ -65,19 +62,21 @@ class _AboutState extends State<About> {
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => const Tutorial()));
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const Tutorial()));
                       },
                       child: Text(AppLocalizations.of(context)!.aboutReplayTutorial),
                     ),
                     TextButton(
-                      onPressed: () => PackageInfo.fromPlatform()
-                          .then((value) => showLicensePage(
-                                context: context,
-                                applicationName: "SUD💜KU",
-                                applicationVersion: value.version,
-                                applicationLegalese: "Licensed under GPLv3",
-                              )),
+                      onPressed: () async {
+                        final value = await PackageInfo.fromPlatform();
+                        if (!context.mounted) return;
+                        showLicensePage(
+                          context: context,
+                          applicationName: "SUD💜KU",
+                          applicationVersion: value.version,
+                          applicationLegalese: "Licensed under GPLv3",
+                        );
+                      },
                       child: Text(AppLocalizations.of(context)!.aboutShowLicenses),
                     )
                   ]),

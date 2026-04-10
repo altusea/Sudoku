@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:sudoku/save_manager.dart';
 import 'package:sudoku/sudoku.dart';
 import 'package:sudoku/util.dart';
@@ -12,6 +13,8 @@ import 'fade_dialog.dart';
 import 'game_board.dart';
 import 'l10n/app_localizations.dart';
 import 'leaderboard.dart';
+
+final _logger = Logger('SudokuGame');
 
 class SudokuGame extends StatefulWidget {
   final int difficulty;
@@ -35,8 +38,7 @@ class _SudokuGameState extends State<SudokuGame> {
   late Timer _refreshTimer;
   _SudokuGameState() : super() {
     // refresh the timer every second
-    _refreshTimer = Timer.periodic(const Duration(milliseconds: 900),
-        (Timer t) => setState(() {})); // TODO store time in variable
+    _refreshTimer = Timer.periodic(const Duration(milliseconds: 900), (Timer t) => setState(() {})); // TODO store time in variable
   }
 
   @override
@@ -48,8 +50,7 @@ class _SudokuGameState extends State<SudokuGame> {
   }
 
   void onBoardChanged(List<List<Cell>> puzzle) {
-    SaveManager().save(widget.difficulty,
-        Sudoku(puzzle, (_stopwatch.elapsed + _stopwatchOffset).inSeconds));
+    SaveManager().save(widget.difficulty, Sudoku(puzzle, (_stopwatch.elapsed + _stopwatchOffset).inSeconds));
 
     // update number buttons
     // the true means nothing, but is required to call setState
@@ -79,8 +80,7 @@ class _SudokuGameState extends State<SudokuGame> {
 
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const ColorSettings()),
+                    MaterialPageRoute(builder: (context) => const ColorSettings()),
                   ).then((value) => setState(() {
                         _stopwatch.start();
                       }));
@@ -112,8 +112,7 @@ class _SudokuGameState extends State<SudokuGame> {
                         flex: 1,
                         child: GridView.builder(
                           shrinkWrap: true,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 5,
                           ),
                           itemBuilder: _buildNumberButton,
@@ -135,12 +134,7 @@ class _SudokuGameState extends State<SudokuGame> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            fadeDialog(
-                                context,
-                                "Are you sure you want to restart with a new board?",
-                                "Cancel",
-                                "Restart",
-                                () => {}, () {
+                            fadeDialog(context, "Are you sure you want to restart with a new board?", "Cancel", "Restart", () => {}, () {
                               _gameBoard.currentState!.restart();
 
                               // reset time
@@ -151,11 +145,8 @@ class _SudokuGameState extends State<SudokuGame> {
                             });
                           },
                           style: ButtonStyle(
-                            shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0))),
-                            side: WidgetStateProperty.all(
-                                const BorderSide(color: Colors.transparent)),
+                            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                            side: WidgetStateProperty.all(const BorderSide(color: Colors.transparent)),
                           ),
                           child: const Icon(Icons.refresh),
                         ),
@@ -164,21 +155,13 @@ class _SudokuGameState extends State<SudokuGame> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            fadeDialog(
-                                context,
-                                "Are you sure you want to validate?",
-                                "Cancel",
-                                "Validate",
-                                () => {}, () {
+                            fadeDialog(context, "Are you sure you want to validate?", "Cancel", "Validate", () => {}, () {
                               _gameBoard.currentState!.validate();
                             });
                           },
                           style: ButtonStyle(
-                            shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0))),
-                            side: WidgetStateProperty.all(
-                                const BorderSide(color: Colors.transparent)),
+                            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                            side: WidgetStateProperty.all(const BorderSide(color: Colors.transparent)),
                           ),
                           child: const Icon(Icons.check),
                         ),
@@ -188,29 +171,23 @@ class _SudokuGameState extends State<SudokuGame> {
                         child: AnimatedContainer(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
-                            color: _marking
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.surface,
+                            color: _marking ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
                           ),
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.ease,
                           child: OutlinedButton(
                             onPressed: () {
                               // toggle marking mode
-                              setState(() {_marking = !_marking;});
+                              setState(() {
+                                _marking = !_marking;
+                              });
                             },
                             style: ButtonStyle(
-                              backgroundColor:
-                                  WidgetStateProperty.all(Colors.transparent),
-                              foregroundColor: WidgetStateProperty.all(_marking
-                                  ? Theme.of(context).colorScheme.surface
-                                  : Theme.of(context).colorScheme.primary), // TODO should I use textColor for these?
-                              shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(30.0))),
-                              side: WidgetStateProperty.all(
-                                  const BorderSide(color: Colors.transparent)),
+                              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                              foregroundColor:
+                                  WidgetStateProperty.all(_marking ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary), // TODO should I use textColor for these?
+                              shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                              side: WidgetStateProperty.all(const BorderSide(color: Colors.transparent)),
                             ),
                             child: const Icon(Icons.edit),
                           ),
@@ -223,11 +200,8 @@ class _SudokuGameState extends State<SudokuGame> {
                             _gameBoard.currentState!.undo();
                           },
                           style: ButtonStyle(
-                            shape: WidgetStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0))),
-                            side: WidgetStateProperty.all(
-                                const BorderSide(color: Colors.transparent)),
+                            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                            side: WidgetStateProperty.all(const BorderSide(color: Colors.transparent)),
                           ),
                           child: const Icon(Icons.undo),
                         ),
@@ -265,17 +239,14 @@ class _SudokuGameState extends State<SudokuGame> {
         curve: Curves.ease,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(300),
-          color: selectedIndex == index
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.surface,
+          color: selectedIndex == index ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
         ),
         child: OutlinedButton(
           onPressed: () {
             numberButtonTapped(index);
           },
           style: ButtonStyle(
-            shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(300.0))),
+            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(300.0))),
             backgroundColor: WidgetStateProperty.all(Colors.transparent),
           ),
           child: Column(
@@ -297,9 +268,7 @@ class _SudokuGameState extends State<SudokuGame> {
                   child: Text(
                     (index == 9) ? "X" : (index + 1).toString(),
                     style: TextStyle(
-                      color: selectedIndex == index
-                          ? Theme.of(context).colorScheme.surface
-                          : Theme.of(context).textTheme.bodyMedium!.color!,
+                      color: selectedIndex == index ? Theme.of(context).colorScheme.surface : Theme.of(context).textTheme.bodyMedium!.color!,
                     ),
                   ),
                 ),
@@ -309,9 +278,7 @@ class _SudokuGameState extends State<SudokuGame> {
                 child: Text(
                   countString,
                   style: TextStyle(
-                    color: selectedIndex == index
-                        ? Theme.of(context).colorScheme.surface
-                        : Theme.of(context).textTheme.bodyMedium!.color!,
+                    color: selectedIndex == index ? Theme.of(context).colorScheme.surface : Theme.of(context).textTheme.bodyMedium!.color!,
                   ),
                 ),
               ),
@@ -344,8 +311,7 @@ class _SudokuGameState extends State<SudokuGame> {
 
   void win(BuildContext context) {
     _stopwatch.stop();
-    Duration gameTime =
-        Duration(seconds: (_stopwatch.elapsed + _stopwatchOffset).inSeconds);
+    Duration gameTime = Duration(seconds: (_stopwatch.elapsed + _stopwatchOffset).inSeconds);
 
     SaveManager().getScores(widget.difficulty).then((List<Score> scores) async {
       SaveManager().clear(widget.difficulty);
@@ -357,7 +323,12 @@ class _SudokuGameState extends State<SudokuGame> {
 
       String timeString = timeToString(gameTime);
 
-      print("Saved scores: $newScores");
+      _logger.info("Saved scores: $newScores");
+
+      if (!context.mounted) {
+        _logger.warning("BUG: this should never happen");
+        return;
+      }
 
       // funny random win string generation
       Random rand = Random();
@@ -366,14 +337,8 @@ class _SudokuGameState extends State<SudokuGame> {
       final List<String> winStrings = AppLocalizations.of(context)!.winStrings(adjectives[rand.nextInt(adjectives.length)]).split(':');
 
       // make the last entry very likely
-      int winStringIndex =
-          rand.nextInt(winStrings.length * 2).clamp(0, winStrings.length - 1);
+      int winStringIndex = rand.nextInt(winStrings.length * 2).clamp(0, winStrings.length - 1);
       String winString = winStrings[winStringIndex];
-
-      if (!context.mounted) {
-        print("BUG: this should never happen");
-        return;
-      }
 
       fadePopup(
           context,
@@ -386,8 +351,7 @@ class _SudokuGameState extends State<SudokuGame> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                        AppLocalizations.of(context)!.winValidationsUsed(_gameBoard.currentState!.getValidations())),
+                    Text(AppLocalizations.of(context)!.winValidationsUsed(_gameBoard.currentState!.getValidations())),
                   ],
                 ),
                 Text(AppLocalizations.of(context)!.winTime(timeString)),
@@ -405,8 +369,7 @@ class _SudokuGameState extends State<SudokuGame> {
                         Navigator.of(context).pop();
                       },
                       style: ButtonStyle(
-                        shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0))),
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
                       ),
                       child: Text(AppLocalizations.of(context)!.winGotIt)),
                 ),

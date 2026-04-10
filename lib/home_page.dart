@@ -7,7 +7,6 @@ import 'package:sudoku/save_manager.dart';
 import 'package:sudoku/sudoku.dart';
 
 import 'about.dart';
-import 'color_settings.dart';
 import 'fade_dialog.dart';
 import 'game.dart';
 import 'l10n/app_localizations.dart';
@@ -29,26 +28,24 @@ class _HomePageState extends State<HomePage> {
 
   void _updateDifficulty(int delta) {
     // clamp difficulty within bounds of array
-    setState(() => _difficulty =
-        max(0, min(Sudoku.numDifficulties - 1, _difficulty + delta)));
+    setState(() => _difficulty = max(0, min(Sudoku.numDifficulties - 1, _difficulty + delta)));
 
     Future<bool> saveFuture = SaveManager().saveExists(_difficulty);
 
     saveFuture.then((value) => setState(() {
-      _difficultyStr = AppLocalizations.of(context)!.difficulties.split(':')[_difficulty];
-      _hasSave = value;
-    }));
+          _difficultyStr = AppLocalizations.of(context)!.difficulties.split(':')[_difficulty];
+          _hasSave = value;
+        }));
 
     SaveManager().saveLastDifficulty(_difficulty);
   }
 
-  @override void initState() {
+  @override
+  void initState() {
     super.initState();
 
     // start at saved difficulty
-    SaveManager().getLastDifficulty().then((value) => {
-      _updateDifficulty(value)
-    });
+    SaveManager().getLastDifficulty().then((value) => {_updateDifficulty(value)});
   }
 
   @override
@@ -71,8 +68,7 @@ class _HomePageState extends State<HomePage> {
                   IconButton(
                     enableFeedback: false,
                     onPressed: null,
-                    icon: Icon(Icons.color_lens,
-                        color: Theme.of(context).canvasColor),
+                    icon: Icon(Icons.color_lens, color: Theme.of(context).canvasColor),
                   )
                 ],
               ),
@@ -80,11 +76,9 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(500)
-                      //more than 50% of width makes circle
-                    ),
+                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(500)
+                        //more than 50% of width makes circle
+                        ),
                     child: Padding(
                       padding: const EdgeInsets.all(32.0),
                       child: CustomPaint(
@@ -102,18 +96,12 @@ class _HomePageState extends State<HomePage> {
                         onPressed: _difficulty == 0
                             ? null
                             : () {
-                          _updateDifficulty(-1);
-                        },
+                                _updateDifficulty(-1);
+                              },
                         style: ButtonStyle(
                           foregroundColor:
-                          WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) =>
-                              states.contains(WidgetState.disabled)
-                                  ? Colors.grey
-                                  : Theme.of(context).colorScheme.primary),
-                          shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0))),
+                              WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) => states.contains(WidgetState.disabled) ? Colors.grey : Theme.of(context).colorScheme.primary),
+                          shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
                         ),
                         child: const Icon(Icons.arrow_left),
                       ),
@@ -129,18 +117,12 @@ class _HomePageState extends State<HomePage> {
                         onPressed: _difficulty == Sudoku.numDifficulties - 1
                             ? null
                             : () {
-                          _updateDifficulty(1);
-                        },
+                                _updateDifficulty(1);
+                              },
                         style: ButtonStyle(
                           foregroundColor:
-                          WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) =>
-                              states.contains(WidgetState.disabled)
-                                  ? Colors.grey
-                                  : Theme.of(context).colorScheme.primary),
-                          shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30.0))),
+                              WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) => states.contains(WidgetState.disabled) ? Colors.grey : Theme.of(context).colorScheme.primary),
+                          shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
                         ),
                         child: const Icon(Icons.arrow_right),
                       ),
@@ -150,20 +132,17 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(16.0),
                     child: OutlinedButton(
                       onPressed: () async {
-                        final temp = await Navigator.push(
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                SudokuGame(difficulty: _difficulty),
+                            builder: (context) => SudokuGame(difficulty: _difficulty),
                           ),
                         );
                         setState(() => _updateDifficulty(0));
                       },
                       style: ButtonStyle(
-                        shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0))),
-                        foregroundColor: WidgetStateProperty.all(
-                            Theme.of(context).textTheme.bodyMedium!.color!),
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                        foregroundColor: WidgetStateProperty.all(Theme.of(context).textTheme.bodyMedium!.color!),
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(16.0),
@@ -173,41 +152,31 @@ class _HomePageState extends State<HomePage> {
                   ),
                   FutureBuilder<Sudoku>(
                       future: SaveManager().load(_difficulty),
-                      builder:
-                          (BuildContext context, AsyncSnapshot<Sudoku> sudoku) {
+                      builder: (BuildContext context, AsyncSnapshot<Sudoku> sudoku) {
                         // TODO how can I check whether the AsyncSnapshot has completed yet?
 
                         return OutlinedButton(
                             onPressed: _hasSave
                                 ? () async {
-                              final temp = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SudokuGame(
-                                    difficulty: _difficulty,
-                                    savedGame: sudoku.data!,
-                                  ),
-                                ),
-                              );
-                              setState(() => _updateDifficulty(0));
-                            }
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SudokuGame(
+                                          difficulty: _difficulty,
+                                          savedGame: sudoku.data!,
+                                        ),
+                                      ),
+                                    );
+                                    setState(() => _updateDifficulty(0));
+                                  }
                                 : null,
                             style: ButtonStyle(
-                              shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(30.0))),
-                              foregroundColor: WidgetStateProperty.all(
-                                  Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .color!
-                                      .withValues(alpha: _hasSave ? 1 : 0.5)),
+                              shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                              foregroundColor: WidgetStateProperty.all(Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: _hasSave ? 1 : 0.5)),
                             ),
                             child: Padding(
                               padding: EdgeInsets.all(16.0),
-                              child: Text(AppLocalizations.of(context)!.homeContinue,
-                                  style: TextStyle(fontSize: 20)),
+                              child: Text(AppLocalizations.of(context)!.homeContinue, style: TextStyle(fontSize: 20)),
                             ));
                       }),
                 ],
@@ -216,51 +185,37 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    color: Theme.of(context).textTheme.bodyMedium!.color!,
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ColorSettings()),
-                    ),
-                    icon: const Icon(Icons.color_lens),
-                  ),
-                  IconButton(
                       color: Theme.of(context).textTheme.bodyMedium!.color!,
-                      onPressed: () => SaveManager()
-                          .getScores(_difficulty)
-                          .then((List<Score> scores) => fadePopup(
-                          context,
-                          AlertDialog(
-                            title: Center(child: Text(AppLocalizations.of(context)!.leaderboardScores)),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                makeLeaderboard(context, scores),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      0, 16.0, 0, 0),
-                                  child: OutlinedButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      style: ButtonStyle(
-                                        shape: WidgetStateProperty.all(
-                                            RoundedRectangleBorder(
-                                                borderRadius:
-                                                BorderRadius.circular(
-                                                    30.0))),
-                                      ),
-                                      child: Text(AppLocalizations.of(context)!.leaderboardClose)),
-                                ),
-                              ],
+                      onPressed: () async {
+                        final scores = await SaveManager().getScores(_difficulty);
+                        if (!context.mounted) return;
+                        fadePopup(
+                            context,
+                            AlertDialog(
+                              title: Center(child: Text(AppLocalizations.of(context)!.leaderboardScores)),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  makeLeaderboard(context, scores),
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
+                                    child: OutlinedButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        style: ButtonStyle(
+                                          shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
+                                        ),
+                                        child: Text(AppLocalizations.of(context)!.leaderboardClose)),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          dismissable: true)),
+                            dismissable: true);
+                      },
                       icon: const Icon(Icons.leaderboard)),
                   IconButton(
                       color: Theme.of(context).textTheme.bodyMedium!.color!,
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => const About()));
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => const About()));
                       },
                       icon: const Icon(Icons.question_mark))
                 ],
