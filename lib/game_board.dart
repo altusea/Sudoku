@@ -239,7 +239,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(markup.length >= 2 ? markup[1] : " "),
-                              Text(markup.length >= 1 ? markup[0] : " "),
+                              Text(markup.isNotEmpty ? markup[0] : " "),
                             ],
                           )
                         ],
