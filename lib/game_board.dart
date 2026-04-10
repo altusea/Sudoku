@@ -19,11 +19,17 @@ class GameBoard extends StatefulWidget {
   final int emptySquares;
   final Sudoku? savedGame;
 
-  const GameBoard({super.key,
-    required this.onBoardChanged, required this.onCellTapped,
-    required this.onGameWon, this.highlightNum = -1, required this.marking,
-    required this.onReady, this.setStopwatchOffset,
-    this.emptySquares = 0, this.savedGame});
+  const GameBoard(
+      {super.key,
+      required this.onBoardChanged,
+      required this.onCellTapped,
+      required this.onGameWon,
+      this.highlightNum = -1,
+      required this.marking,
+      required this.onReady,
+      this.setStopwatchOffset,
+      this.emptySquares = 0,
+      this.savedGame});
 
   @override
   State<StatefulWidget> createState() => GameBoardState();
@@ -61,8 +67,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
           removeTop: true,
           child: GridView.builder(
             shrinkWrap: true,
-            gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: _boardLength,
             ),
             itemBuilder: _buildGridItems,
@@ -80,41 +85,28 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     int boardLength = 9;
     int sectorLength = 3;
 
-    int x,
-        y = 0;
+    int x, y = 0;
     x = (index % boardLength);
     y = (index / boardLength).floor();
 
     // not my best code...
     Border border = Border(
       right: ((x % sectorLength == sectorLength - 1) && (x != boardLength - 1))
-          ? BorderSide(width: 2.0, color: Theme
-          .of(context)
-          .colorScheme.primary)
-          : ((x == boardLength - 1)
-          ? BorderSide.none
-          : BorderSide(width: 1.0, color: Theme
-          .of(context)
-          .dividerColor)),
+          ? BorderSide(width: 2.0, color: Theme.of(context).colorScheme.primary)
+          : ((x == boardLength - 1) ? BorderSide.none : BorderSide(width: 1.0, color: Theme.of(context).dividerColor)),
       bottom: ((y % sectorLength == sectorLength - 1) && (y != boardLength - 1))
-          ? BorderSide(width: 2.0, color: Theme
-          .of(context)
-          .colorScheme.primary)
-          : ((y == boardLength - 1)
-          ? BorderSide.none
-          : BorderSide(width: 1.0, color: Theme
-          .of(context)
-          .dividerColor)),
+          ? BorderSide(width: 2.0, color: Theme.of(context).colorScheme.primary)
+          : ((y == boardLength - 1) ? BorderSide.none : BorderSide(width: 1.0, color: Theme.of(context).dividerColor)),
     );
 
     return GestureDetector(
       onTap: () => onCellTapped(x, y),
-      child: Container( // for tap target
+      child: Container(
+        // for tap target
         color: Colors.transparent,
         child: GridTile(
           child: CustomPaint(
-            foregroundPainter: EdgePainter(
-                border, x != boardLength - 1, y != boardLength - 1),
+            foregroundPainter: EdgePainter(border, x != boardLength - 1, y != boardLength - 1),
             //decoration: BoxDecoration(border: border),
             child: Center(
               child: _buildGridItem(x, y),
@@ -139,11 +131,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
       return const SizedBox.shrink();
     } // show nothing for empty cells
 
-    Color textColor = Theme
-        .of(context)
-        .textTheme
-        .bodyMedium!
-        .color!;
+    Color textColor = Theme.of(context).textTheme.bodyMedium!.color!;
     Color itemColor = Colors.transparent;
 
     if (cell.prefill) {
@@ -154,112 +142,93 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     bool highlighted = false;
 
     if (val == widget.highlightNum || cell.markup.contains(widget.highlightNum)) {
-      itemColor = Theme
-          .of(context)
-          .colorScheme.primary;
+      itemColor = Theme.of(context).colorScheme.primary;
       highlighted = true;
     }
 
-    if (_validationWrongCells
-        .any((element) => ((element.x == x) && (element.y == y)))) {
+    if (_validationWrongCells.any((element) => ((element.x == x) && (element.y == y)))) {
       itemColor = Colors.red.shade300;
       highlighted = true;
     }
 
-    List<String> markup = List.generate(cell.markup.length,
-            (index) => cell.markup[index].toString());
+    List<String> markup = List.generate(cell.markup.length, (index) => cell.markup[index].toString());
 
     return Padding(
       padding: const EdgeInsets.all(5.0),
-      child: Stack(
-          children: [
-            ScaleTransition(
-              scale: animation,
-              alignment: Alignment.center,
-              child: AnimatedContainer(
-                curve: Curves.ease,
-                duration: const Duration(milliseconds: 100),
-                width: double.infinity,
-                height: double.infinity,
-                decoration: BoxDecoration(
-                    color: itemColor, borderRadius: BorderRadius.circular(500)
-                  //more than 50% of width makes circle
+      child: Stack(children: [
+        ScaleTransition(
+          scale: animation,
+          alignment: Alignment.center,
+          child: AnimatedContainer(
+            curve: Curves.ease,
+            duration: const Duration(milliseconds: 100),
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(color: itemColor, borderRadius: BorderRadius.circular(500)
+                //more than 50% of width makes circle
                 ),
-                child: null,
-              ),
-            ),
-            ScaleTransition(
-              scale: _generated ? _noAnimation : animation,
-              alignment: Alignment.center,
-              child: AnimatedBuilder(
-                animation: animation,
-                builder: (context, child) =>
-                    DefaultTextStyle(
-                        style: DefaultTextStyle
-                            .of(context)
-                            .style
-                            .apply(
-                            decoration: TextDecoration.none,
-                            color: highlighted
-                                ? ColorTween(begin: textColor, end: Theme
-                                .of(context)
-                                .canvasColor)
-                                .animate(animation)
-                                .value!
-                                : textColor),
-                        child: child!
-                    ),
-                child: Center(
-                  child: cell.markup.isNotEmpty
-                      ? Container(
-                    color: Colors.transparent,
-                    child: FittedBox(
-                      fit: BoxFit.fill,
-                      child: Column(
-                        children: [
-                          // TODO this is ugly. Is there a better way?
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            // NQSP to preserve small text size
-                            children: [
-                              Text(markup.length >= 8 ? markup[7] : " "),
-                              Text(markup.length >= 7 ? markup[6] : " "),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(markup.length >= 6 ? markup[5] : " "),
-                              Text(markup.length >= 5 ? markup[4] : " "),
-                              Text(markup.length >= 4 ? markup[3] : " "),
-                              Text(markup.length >= 3 ? markup[2] : " "),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(markup.length >= 2 ? markup[1] : " "),
-                              Text(markup.isNotEmpty ? markup[0] : " "),
-                            ],
-                          )
-                        ],
+            child: null,
+          ),
+        ),
+        ScaleTransition(
+          scale: _generated ? _noAnimation : animation,
+          alignment: Alignment.center,
+          child: AnimatedBuilder(
+            animation: animation,
+            builder: (context, child) => DefaultTextStyle(
+                style: DefaultTextStyle.of(context)
+                    .style
+                    .apply(decoration: TextDecoration.none, color: highlighted ? ColorTween(begin: textColor, end: Theme.of(context).canvasColor).animate(animation).value! : textColor),
+                child: child!),
+            child: Center(
+              child: cell.markup.isNotEmpty
+                  ? Container(
+                      color: Colors.transparent,
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              // NQSP to preserve small text size
+                              children: [
+                                Text(markup.length >= 8 ? markup[7] : " "),
+                                Text(markup.length >= 7 ? markup[6] : " "),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(markup.length >= 6 ? markup[5] : " "),
+                                Text(markup.length >= 5 ? markup[4] : " "),
+                                Text(markup.length >= 4 ? markup[3] : " "),
+                                Text(markup.length >= 3 ? markup[2] : " "),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(markup.length >= 2 ? markup[1] : " "),
+                                Text(markup.isNotEmpty ? markup[0] : " "),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  : SizedBox(
+                      height: double.infinity,
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        child: Text(
+                          val.toString(),
+                        ),
                       ),
                     ),
-                  )
-                      : SizedBox(
-                    height: double.infinity,
-                    child: FittedBox(
-                      fit: BoxFit.fill,
-                      child: Text(
-                        val.toString(),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
             ),
-          ]
-      ),
+          ),
+        ),
+      ]),
     );
   }
 
@@ -278,8 +247,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
     // place cell
     setState(() {
-      _undoStack
-          .push([Move(x, y, cell.value, List.from(cell.markup))]);
+      _undoStack.push([Move(x, y, cell.value, List.from(cell.markup))]);
 
       AnimationController animation = _scaleAnimationControllers[y * 9 + x];
 
@@ -293,16 +261,13 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
             });
           });
 
-          _validationWrongCells.removeWhere(
-                  (element) => (x == element.x && y == element.y));
+          _validationWrongCells.removeWhere((element) => (x == element.x && y == element.y));
 
           animation.reset();
           animation.reverse(from: 1.0);
         } else {
           if (widget.marking && widget.highlightNum > 0) {
-            if (cell.markup.isEmpty ||
-                (!cell.markup.contains(widget.highlightNum) &&
-                    cell.markup.length <= 8)) {
+            if (cell.markup.isEmpty || (!cell.markup.contains(widget.highlightNum) && cell.markup.length <= 8)) {
               cell.markup.add(widget.highlightNum);
 
               animation.reset();
@@ -322,7 +287,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
             }
 
             _puzzle![y][x].value = 0;
-          } else if(widget.highlightNum != -1) {
+          } else if (widget.highlightNum != -1) {
             cell.markup.clear();
             _puzzle![y][x].value = widget.highlightNum;
 
@@ -332,8 +297,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
                 bool ret = val == widget.highlightNum;
 
                 if (ret) {
-                  _undoStack.peek.add(Move(x, row, _puzzle![row][x].value,
-                      List.from(_puzzle![row][x].markup)));
+                  _undoStack.peek.add(Move(x, row, _puzzle![row][x].value, List.from(_puzzle![row][x].markup)));
                 }
 
                 return ret;
@@ -345,9 +309,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
                 bool ret = val == widget.highlightNum;
 
                 if (ret) {
-                  _undoStack.peek.add(Move(column, y,
-                      _puzzle![y][column].value,
-                      List.from(_puzzle![y][column].markup)));
+                  _undoStack.peek.add(Move(column, y, _puzzle![y][column].value, List.from(_puzzle![y][column].markup)));
                 }
 
                 return ret;
@@ -357,15 +319,12 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
             int rowStart = y - (y % 3);
             int columnStart = x - (x % 3);
             for (int row = rowStart; row < rowStart + 3; row++) {
-              for (int column = columnStart; column <
-                  columnStart + 3; column++) {
+              for (int column = columnStart; column < columnStart + 3; column++) {
                 _puzzle![row][column].markup.removeWhere((int val) {
                   bool ret = val == widget.highlightNum;
 
                   if (ret) {
-                    _undoStack.peek.add(Move(
-                        column, row, _puzzle![row][column].value,
-                        List.from(_puzzle![row][column].markup)));
+                    _undoStack.peek.add(Move(column, row, _puzzle![row][column].value, List.from(_puzzle![row][column].markup)));
                   }
 
                   return ret;
@@ -377,15 +336,13 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
             animation.forward();
           }
 
-          _validationWrongCells.removeWhere(
-                  (element) => (x == element.x && y == element.y));
+          _validationWrongCells.removeWhere((element) => (x == element.x && y == element.y));
 
           widget.onBoardChanged!(_puzzle!);
 
           List<List<int>> sudoku = List.empty(growable: true);
           for (int row = 0; row < 9; row++) {
-            sudoku.add(
-                List.generate(9, (column) => _puzzle![row][column].value));
+            sudoku.add(List.generate(9, (column) => _puzzle![row][column].value));
           }
 
           try {
@@ -403,8 +360,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
         widget.onBoardChanged!(_puzzle!);
 
-        _validationWrongCells.removeWhere(
-                (element) => (x == element.x && y == element.y));
+        _validationWrongCells.removeWhere((element) => (x == element.x && y == element.y));
 
         animation.reset();
         animation.reverse(from: 1.0);
@@ -418,17 +374,15 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
   void ensurePuzzle() async {
     if (_puzzle == null) {
-      if(widget.savedGame == null || _hasReset) {
-        // TODO async?
-
+      if (widget.savedGame == null || _hasReset) {
         _puzzle = List.empty(growable: true);
 
         int emptySquares = widget.emptySquares;
-        emptySquares.clamp(1, 9*9);
+        emptySquares.clamp(1, 9 * 9);
 
         List<List<int>> board = SudokuGenerator(emptySquares: emptySquares).newSudoku;
 
-        for(int row = 0; row < board.length; row++) {
+        for (int row = 0; row < board.length; row++) {
           _puzzle!.add(List.generate(9, (column) {
             int val = board[row][column];
             return Cell(Position(column, row), val, val != 0);
@@ -437,7 +391,6 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
         onReady();
       } else {
-
         _puzzle = widget.savedGame!.game;
 
         widget.setStopwatchOffset?.call(Duration(seconds: widget.savedGame!.time));
@@ -450,7 +403,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     setState(() {
       Random rand = Random();
 
-      for(int i = 0; i < _scaleAnimationControllers.length; i++) {
+      for (int i = 0; i < _scaleAnimationControllers.length; i++) {
         Future.delayed(Duration(milliseconds: rand.nextInt(1000)), () {
           _scaleAnimationControllers[i].reset();
           _scaleAnimationControllers[i].forward();
@@ -461,7 +414,6 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
         _generated = true;
       });
     });
-
 
     widget.onReady!();
 
@@ -478,13 +430,9 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
       for (int x = 0; x < 9; x++) {
         for (int y = 0; y < 9; y++) {
           Cell cell = _puzzle![y][x];
-          if (cell.value != 0 &&
-              !cell.prefill) {
-
-            if(cellInvalid(x, y)) {
-              _validationWrongCells
-                  .add(
-                  Position(x, y));
+          if (cell.value != 0 && !cell.prefill) {
+            if (cellInvalid(x, y)) {
+              _validationWrongCells.add(Position(x, y));
             }
           }
         }
@@ -495,7 +443,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
   bool cellInvalid(int x, int y) {
     Cell cell = _puzzle![y][x];
 
-    if(cell.prefill) {
+    if (cell.prefill) {
       return false;
     }
 
@@ -506,33 +454,33 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     int rowStart = y - (y % 3);
     int columnStart = x - (x % 3);
 
-    for(int row = 0; row < 3; row++) {
-      for(int column = 0; column < 3; column++) {
+    for (int row = 0; row < 3; row++) {
+      for (int column = 0; column < 3; column++) {
         segment.add(_puzzle![row + rowStart][column + columnStart]);
       }
     }
 
-    if(valueRepeats(segment, value)) {
+    if (valueRepeats(segment, value)) {
       return true;
     }
 
     // check row
     List<Cell> row = List.empty(growable: true);
-    for(int column = 0; column < 9; column++) {
+    for (int column = 0; column < 9; column++) {
       row.add(_puzzle![y][column]);
     }
 
-    if(valueRepeats(row, value)) {
+    if (valueRepeats(row, value)) {
       return true;
     }
 
     // check column
     List<Cell> column = List.empty(growable: true);
-    for(int row = 0; row < 9; row++) {
+    for (int row = 0; row < 9; row++) {
       column.add(_puzzle![row][x]);
     }
 
-    if(valueRepeats(column, value)) {
+    if (valueRepeats(column, value)) {
       return true;
     }
 
@@ -541,7 +489,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
   bool valueRepeats(List<Cell> cells, int value) {
     Set<int> seenValues = {};
-    for(int i = 0; i < cells.length; i++) {
+    for (int i = 0; i < cells.length; i++) {
       int curVal = cells[i].value;
 
       if (seenValues.contains(curVal) && curVal == value) {
@@ -599,13 +547,12 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
     for (int x = 0; x < 9; x++) {
       for (int y = 0; y < 9; y++) {
-        if (_puzzle![y][x].value == highlightedNum) { // TODO maybe check markup
+        if (_puzzle![y][x].value == highlightedNum || _puzzle![y][x].markup.contains(highlightedNum)) {
           AnimationController animation = _scaleAnimationControllers[y * 9 + x];
 
           animation.reset();
 
-          Future.delayed(Duration(milliseconds: rand.nextInt(200)), ()
-          {
+          Future.delayed(Duration(milliseconds: rand.nextInt(200)), () {
             animation.reset();
             animation.forward();
           });
@@ -636,7 +583,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _scaleAnimationControllers = List.generate(9*9, (index) {
+    _scaleAnimationControllers = List.generate(9 * 9, (index) {
       return AnimationController(
         duration: const Duration(milliseconds: 500),
         reverseDuration: const Duration(milliseconds: 200),
@@ -646,18 +593,19 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
 
     //_scaleAnimationControllers.forEach((element) => element.reset());
 
-    _scaleAnimations = List.generate(9*9, (index) {
+    _scaleAnimations = List.generate(9 * 9, (index) {
       return CurvedAnimation(parent: _scaleAnimationControllers[index], curve: Curves.fastLinearToSlowEaseIn);
     });
 
     _noAnimationController = AnimationController(vsync: this, value: 1);
     _noAnimation = CurvedAnimation(parent: _noAnimationController, curve: Curves.linear);
   }
+
   @override
   void dispose() {
     super.dispose();
 
-    for(int i = 0; i < _scaleAnimationControllers.length; i++) {
+    for (int i = 0; i < _scaleAnimationControllers.length; i++) {
       _scaleAnimationControllers[i].dispose();
     }
   }

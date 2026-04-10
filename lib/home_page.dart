@@ -153,8 +153,6 @@ class _HomePageState extends State<HomePage> {
                   FutureBuilder<Sudoku>(
                       future: SaveManager().load(_difficulty),
                       builder: (BuildContext context, AsyncSnapshot<Sudoku> sudoku) {
-                        // TODO how can I check whether the AsyncSnapshot has completed yet?
-
                         return OutlinedButton(
                             onPressed: _hasSave
                                 ? () async {

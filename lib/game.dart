@@ -38,7 +38,7 @@ class _SudokuGameState extends State<SudokuGame> {
   late Timer _refreshTimer;
   _SudokuGameState() : super() {
     // refresh the timer every second
-    _refreshTimer = Timer.periodic(const Duration(milliseconds: 900), (Timer t) => setState(() {})); // TODO store time in variable
+    _refreshTimer = Timer.periodic(const Duration(milliseconds: 900), (Timer t) => setState(() {}));
   }
 
   @override
@@ -184,8 +184,7 @@ class _SudokuGameState extends State<SudokuGame> {
                             },
                             style: ButtonStyle(
                               backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                              foregroundColor:
-                                  WidgetStateProperty.all(_marking ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary), // TODO should I use textColor for these?
+                              foregroundColor: WidgetStateProperty.all(_marking ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.primary),
                               shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
                               side: WidgetStateProperty.all(const BorderSide(color: Colors.transparent)),
                             ),
@@ -364,7 +363,6 @@ class _SudokuGameState extends State<SudokuGame> {
                         // clear save again for good measure
                         SaveManager().clear(widget.difficulty);
 
-                        // TODO is this a good idea/allowed? How else do I pop twice?
                         Navigator.of(context).pop();
                         Navigator.of(context).pop();
                       },

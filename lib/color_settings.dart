@@ -79,7 +79,7 @@ class _ColorSettingsState extends State<ColorSettings> {
                             style: ButtonStyle(
                               shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
                               backgroundColor: WidgetStateProperty.all(curColor),
-                              overlayColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary), // TODO does this look good?
+                              overlayColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary),
                             ),
                             child: const SizedBox(
                               width: 64,
@@ -139,7 +139,6 @@ class _ColorSettingsState extends State<ColorSettings> {
                       onPressed: () {
                         final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
 
-                        // TODO: how to reset?
                         themeProvider.setPrimaryColor(const Color.fromARGB(255, 255, 0, 0), true);
                         themeProvider.setThemeMode(ThemeMode.system, true);
                       },
