@@ -19,17 +19,17 @@ class SaveManager {
   Future<int> getLastDifficulty() async {
     final SharedPreferences prefs = await _prefs;
 
-    if(prefs.containsKey("lastDifficulty")) {
+    if (prefs.containsKey("lastDifficulty")) {
       return prefs.getInt("lastDifficulty")!;
     } else {
       return 2; // default to "Medium"
     }
   }
 
-  void saveLastDifficulty(int difficulty) async {
+  Future<void> saveLastDifficulty(int difficulty) async {
     final SharedPreferences prefs = await _prefs;
 
-    prefs.setInt("lastDifficulty", difficulty);
+    await prefs.setInt("lastDifficulty", difficulty);
   }
 
   Future<bool> saveExists(int difficulty) async {
@@ -38,7 +38,7 @@ class SaveManager {
     return prefs.containsKey("board$difficulty");
   }
 
-  void save(int difficulty, Sudoku data) async {
+  Future<void> save(int difficulty, Sudoku data) async {
     final SharedPreferences prefs = await _prefs;
 
     await prefs.setString("board$difficulty", json.encode(data));
@@ -54,14 +54,14 @@ class SaveManager {
     return Sudoku.fromJson(jason);
   }
 
-  void clear(int difficulty) async {
+  Future<void> clear(int difficulty) async {
     final SharedPreferences prefs = await _prefs;
 
-    prefs.remove("board$difficulty");
+    await prefs.remove("board$difficulty");
   }
 
   // scores are stringified as yMd#time
-  void recordScore(Duration time, int difficulty) async {
+  Future<void> recordScore(Duration time, int difficulty) async {
     final SharedPreferences prefs = await _prefs;
 
     List<String> scores = prefs.getStringList("scores$difficulty") ?? List<String>.empty(growable: true);
@@ -86,11 +86,11 @@ class SaveManager {
     }
     scores.insert(index, currentScore);
 
-    if(scores.length > 10) {
+    if (scores.length > 10) {
       scores.removeRange(10, scores.length);
     }
 
-    prefs.setStringList("scores$difficulty", scores);
+    await prefs.setStringList("scores$difficulty", scores);
   }
 
   Future<List<Score>> getScores(int difficulty) async {
@@ -103,14 +103,8 @@ class SaveManager {
 
     List<Score> ret = List<Score>.empty(growable: true);
 
-    for(int i = 0; i < scores.length; i++) {
-      ret.add(
-        Score(
-          Duration(seconds: int.parse(scores[i].substring(
-              scores[i].indexOf('#') + 1, scores[i].length))),
-          scores[i].substring(0, scores[i].indexOf('#'))
-        )
-      );
+    for (int i = 0; i < scores.length; i++) {
+      ret.add(Score(Duration(seconds: int.parse(scores[i].substring(scores[i].indexOf('#') + 1, scores[i].length))), scores[i].substring(0, scores[i].indexOf('#'))));
     }
 
     return ret;
@@ -119,7 +113,7 @@ class SaveManager {
   Future<bool> hasSeenTutorial() async {
     final SharedPreferences prefs = await _prefs;
 
-    if(!prefs.containsKey("seenTutorial")) {
+    if (!prefs.containsKey("seenTutorial")) {
       return false;
     }
 
@@ -129,7 +123,7 @@ class SaveManager {
   Future<void> markTutorialSeen(bool seen) async {
     final SharedPreferences prefs = await _prefs;
 
-    prefs.setBool("seenTutorial", seen);
+    await prefs.setBool("seenTutorial", seen);
   }
 
   Future<bool> isCustomTheme() async {
@@ -139,7 +133,7 @@ class SaveManager {
 
   Future<void> markCustomTheme(bool custom) async {
     final SharedPreferences prefs = await _prefs;
-    prefs.setBool("customTheme", custom);
+    await prefs.setBool("customTheme", custom);
   }
 
   Future<bool> isDark() async {
@@ -149,13 +143,13 @@ class SaveManager {
 
   Future<void> setDark(bool dark) async {
     final SharedPreferences prefs = await _prefs;
-    prefs.setBool("themeDarkMode", dark);
+    await prefs.setBool("themeDarkMode", dark);
   }
 
   Future<Color?> getPrimaryColor() async {
     final SharedPreferences prefs = await _prefs;
     final int? colorVal = prefs.getInt("themePrimaryColor");
-    if(colorVal == null) {
+    if (colorVal == null) {
       return null;
     }
     return Color(colorVal);
@@ -163,7 +157,7 @@ class SaveManager {
 
   Future<void> setPrimaryColor(Color color) async {
     final SharedPreferences prefs = await _prefs;
-    prefs.setInt("themePrimaryColor", color.toARGB32());
+    await prefs.setInt("themePrimaryColor", color.toARGB32());
   }
 }
 

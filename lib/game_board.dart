@@ -372,7 +372,7 @@ class GameBoardState extends State<GameBoard> with TickerProviderStateMixin {
     widget.onGameWon!(context);
   }
 
-  void ensurePuzzle() async {
+  void ensurePuzzle() {
     if (_puzzle == null) {
       if (widget.savedGame == null || _hasReset) {
         _puzzle = List.empty(growable: true);

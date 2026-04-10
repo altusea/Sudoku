@@ -313,10 +313,10 @@ class _SudokuGameState extends State<SudokuGame> {
     Duration gameTime = Duration(seconds: (_stopwatch.elapsed + _stopwatchOffset).inSeconds);
 
     SaveManager().getScores(widget.difficulty).then((List<Score> scores) async {
-      SaveManager().clear(widget.difficulty);
+      await SaveManager().clear(widget.difficulty);
 
       // record the new score
-      SaveManager().recordScore(gameTime, widget.difficulty);
+      await SaveManager().recordScore(gameTime, widget.difficulty);
 
       List<Score> newScores = await SaveManager().getScores(widget.difficulty);
 
